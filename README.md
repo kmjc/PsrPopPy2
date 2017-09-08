@@ -1,5 +1,19 @@
-PsrPopPy
+PsrPopPy2
 ========
+
+
+2nd Version
+-----------
+Added rrat generation and detection part.
+
+To use single pulse snr use --singlepulse in populate and dosurvey. This will also generate a burst-rate based on a unifomr distrubution.
+
+
+
+
+
+Old Info
+--------
 
 (For full documentation, see http://samb8s.github.com/PsrPopPy/ or manual.pdf)
 
