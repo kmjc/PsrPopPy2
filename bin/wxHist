@@ -1,0 +1,236 @@
+#!/usr/bin/python
+
+import sys
+import os
+import argparse
+import random
+import math
+
+import cPickle
+import numpy as np
+
+import wx
+import matplotlib
+matplotlib.use('WXAgg')
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_wxagg import \
+    FigureCanvasWxAgg as FigCanvas, \
+    NavigationToolbar2WxAgg as NavigationToolbar
+sys.path.append("../lib/python") 
+import dataobj
+
+class ViewException(Exception):
+    pass
+
+
+class VisualizeFrame(wx.Frame):
+    def __init__(self, dataObjList):
+
+        self.dataObjList = dataObjList
+        wx.Frame.__init__(self, None, -1)
+
+        self.colour_list = ['b.', 'r.', 'g.', 'c.', 'm.', 'y.', 'k.']
+        self.create_main_panel()
+
+    def create_main_panel(self):
+        self.panel = wx.Panel(self)
+        self.dpi = 100
+        self.fig = Figure((5., 5.), dpi = self.dpi)
+        self.canvas = FigCanvas(self.panel, -1, self.fig)
+
+        self.axes = self.fig.add_subplot(111)
+
+        self.drawbutton = wx.Button(self.panel, -1, "Plot")
+        self.Bind(wx.EVT_BUTTON, self.on_draw_button, self.drawbutton)
+
+        self.logx = wx.CheckBox(self.panel, -1, 
+            "log X",
+            style=wx.ALIGN_RIGHT)
+        self.Bind(wx.EVT_CHECKBOX, self.on_logx, self.logx)
+
+        """
+        self.logy = wx.CheckBox(self.panel, -1, 
+            "log Y",
+            style=wx.ALIGN_RIGHT)
+        self.Bind(wx.EVT_CHECKBOX, self.on_logy, self.logy)
+        """
+
+        self.grid = wx.CheckBox(self.panel, -1, 
+            "grid",
+            style=wx.ALIGN_RIGHT)
+        self.Bind(wx.EVT_CHECKBOX, self.on_grid, self.grid)
+
+        self.nbins_label = wx.StaticText(self.panel, -1,
+                "Bins:",
+                style=wx.ALIGN_RIGHT)
+        self.nbins_box = wx.SpinCtrl(self.panel, value='30', 
+                                        min=1, max=1000)
+        
+        
+        modelList = [d.name for d in self.dataObjList]
+
+        # create list of population models. Set all "on" by default
+        self.modelCheckList = wx.CheckListBox(self.panel, -1,
+                                            choices=modelList,
+                                            style=wx.ALIGN_RIGHT)
+        self.modelCheckList.SetChecked(xrange(len(modelList)))
+
+        # Create the navigation toolbar, tied to the canvas
+        #
+        self.toolbar = NavigationToolbar(self.canvas)
+
+        #
+        # Layout with box sizers
+        #
+
+        self.vbox = wx.BoxSizer(wx.VERTICAL)
+        self.v_buttonbox_1 = wx.BoxSizer(wx.VERTICAL)
+        self.v_buttonbox_2 = wx.BoxSizer(wx.VERTICAL)
+        self.hpltbox = wx.BoxSizer(wx.HORIZONTAL) # for plot and plot selection
+        self.htoolbox = wx.BoxSizer(wx.HORIZONTAL) # for drawing and log toggles
+
+        # fill the top box first, radio buttons in a vbox, 
+        # next to the canvas
+        self.radioBoxX = wx.RadioBox(
+                            self.panel, 1, 'X Axis',
+                            choices = sorted(self.dataObjList[0].labelDict.keys()),
+                            majorDimension=1,
+                            style = wx.RA_SPECIFY_COLS)
+
+        # Initialise x,y selected radio buttons to Period and DM.
+        self.xIndex='Period'
+        self.radioBoxX.SetStringSelection(self.xIndex)
+
+        # event for radio box with ID 1
+        wx.EVT_RADIOBOX(self.panel, 1, self.onXRadioClick)
+
+
+        # top horizontal panel - canvas and radio boxes
+        self.hpltbox.Add(self.radioBoxX)
+        self.hpltbox.Add(self.canvas, 1, wx.LEFT | wx.TOP | wx.GROW)
+        self.hpltbox.Add(self.modelCheckList, 0, wx.GROW, border=3)
+
+        # add the matplotlib toolbar
+        self.vbox.Add(self.hpltbox)
+        self.vbox.Add(self.toolbar, 0, wx.EXPAND)
+        self.vbox.AddSpacer(10)
+
+
+        # bottom horizontal panel - check buttons and plot button
+        flags = wx.ALIGN_LEFT | wx.ALL | wx.ALIGN_CENTER_VERTICAL
+        self.htoolbox.Add(self.drawbutton, 0, border=3, flag=flags)
+        self.htoolbox.Add(self.nbins_label, 0, border=3, flag=flags)
+        self.htoolbox.Add(self.nbins_box, 0, border=3, flag=flags)
+        self.htoolbox.Add(self.logx, 0, border=3, flag=flags)
+        #self.htoolbox.Add(self.logy, 0, border=3, flag=flags)
+        self.htoolbox.AddSpacer(20)
+        self.htoolbox.Add(self.grid, 0, border=3, flag=flags)
+
+        self.vbox.Add(self.htoolbox, 0, flag = wx.ALIGN_LEFT | wx.TOP)
+
+        self.panel.SetSizer(self.vbox)
+        self.vbox.Fit(self)
+
+    def onXRadioClick(self, event):
+        # get x index of selected button
+        radioBox = event.GetEventObject()
+        self.xIndex=radioBox.GetStringSelection()
+
+    def draw_figure(self):
+        self.axes.clear()
+        for dataObjIndex in self.modelCheckList.GetChecked():
+            self.axes.set_xlabel(self.dataObjList[0].labelDict[self.xIndex], 
+                                    fontsize=10)
+            if self.logx.IsChecked():
+                try:
+                    plot_list = [math.log10(xval) for xval in
+                            self.dataObjList[dataObjIndex].dataDict[self.xIndex]]
+                    self.axes.set_xlabel("log "+self.dataObjList[0].labelDict[self.xIndex], 
+                                    fontsize=10)
+                except ValueError:
+                    plot_list = \
+                    list(self.dataObjList[dataObjIndex].dataDict[self.xIndex])
+            else:
+                plot_list = \
+                    list(self.dataObjList[dataObjIndex].dataDict[self.xIndex])
+
+            try:
+                self.axes.hist(plot_list,
+                                self.nbins,
+                                fill=self.colour_list[dataObjIndex],
+                                alpha=0.35,
+                                normed=True)
+            except IndexError:
+                self.axes.hist(plot_list,
+                                self.nbins,
+                                alpha=0.35,
+                                normed=True)
+
+        if len(self.modelCheckList.GetChecked())>0:
+
+            #self.axes.set_xlabel(self.dataObjList[0].labelDict[self.xIndex], 
+            #                        fontsize=10)
+            self.axes.set_ylabel("Normalised Frequency",
+                                 fontsize=10)
+
+            for label in self.axes.get_xticklabels():
+                label.set_fontsize(7)
+            for label in self.axes.get_yticklabels():
+                label.set_fontsize(7)
+
+        #if self.logx.IsChecked():
+        #    self.axes.set_xscale('log')
+        #    for label in self.axes.get_xticklabels():
+        #        label.set_fontsize(7)
+
+        """
+        if self.logy.IsChecked():
+            self.axes.set_yscale('log')
+            for label in self.axes.get_yticklabels():
+                label.set_fontsize(7)
+        """
+
+        self.axes.grid(self.grid.IsChecked())
+        self.canvas.draw()
+
+    def on_draw_button(self, event):
+        # redraw the canvas
+        self.nbins = self.nbins_box.GetValue()
+        self.draw_figure()
+
+    def on_logx(self, event):
+        # placeholder functions in case I want to do something else
+        # decided I don't want plot to redraw until the button is
+        # clicke, rather than on selection of log axis
+        pass
+
+    def on_logy(self, event):
+        pass
+
+    def on_grid(self, event):
+        self.draw_figure()
+
+
+if __name__ == '__main__':
+    """ 'Main' function for calling from command line"""
+    parser = argparse.ArgumentParser(description='Visualize a population object')
+    parser.add_argument('-f', metavar='fname', default=None,
+                          help='file containing population model (def="*.model, *.results")')
+
+    parser.add_argument('-frac', nargs=1, type=float, default=None, 
+                          help='plot only this fraction of pulsars')
+
+    parser.add_argument('-extn', nargs='+', type=str,
+                        default=['.results', '.model'],
+                        help='extension(s) to look for when finding population models')
+    args = parser.parse_args()
+
+    dataObj = dataobj.makeDataObj(modelname = args.f, 
+                                  frac=args.frac,
+                                  extnList=args.extn)
+
+    app = wx.App(False)
+    app.frame = VisualizeFrame(dataObj)
+    app.frame.Show()
+    app.MainLoop()
+
