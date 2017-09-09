@@ -7,6 +7,8 @@ PsrPopPy2
 Added rrat generation and detection part.
 
 To use single pulse snr use --singlepulse in populate and dosurvey. This will also generate a burst-rate based on a uniform distrubution.
+(eg. populate -n 1000 -pdist d_g -dgf corr_pops -ldist d_g -zdist d_g -rdist d_g -zdist d_g -surveys PMSURV --singlepulse)
+
 
 Additions
 1. Can now draw samples from histograms for P, L, Z, R (eg. -pdist d_g -dgf <dist_file>. Generate dist_file using make_d_g.py)
