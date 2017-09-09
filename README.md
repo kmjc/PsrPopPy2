@@ -6,10 +6,12 @@ PsrPopPy2
 -----------
 Added rrat generation and detection part.
 
-To use single pulse snr use --singlepulse in populate and dosurvey. This will also generate a burst-rate based on a unifomr distrubution.
+To use single pulse snr use --singlepulse in populate and dosurvey. This will also generate a burst-rate based on a uniform distrubution.
 
-
-
+Additions
+1. Can now draw samples from histograms for P, L, Z, R (eg. -pdist d_g -dgf <dist_file>. Generate dist_file using make_d_g.py)
+2. Single Pulse SNR and Burst Rate for Radio Transients (use --singlepulse in populate and dosurvey)
+3. wxHist and wxView now support burst rate.
 
 
 Old Info
