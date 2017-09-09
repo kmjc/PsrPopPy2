@@ -443,7 +443,8 @@ def generate(ngen,
             print "    Number too faint = {0}".format(surv.ntf)
             print "    Number smeared = {0}".format(surv.nsmear)
             print "    Number outside survey area = {0}".format(surv.nout)
-            print "    Number didn't burst =  {0}".format(surv.nbr)
+            if singlepulse:
+                print "    Number didn't burst =  {0}".format(surv.nbr)
 
     return pop
 

@@ -158,7 +158,8 @@ def run(pop,
             print "Number too faint = {0}".format(ntf)
             print "Number smeared = {0}".format(nsmear)
             print "Number out = {0}".format(nout)
-            print "Number didn't burst = {0}".format(nbr)
+            if rratssearch:
+                print "Number didn't burst = {0}".format(nbr)
             print "\n"
 
         d = Detections(ndet=ndet,
