@@ -20,17 +20,6 @@ from survey import Survey
 
 from progressbar import ProgressBar
 
-'''
-Modifications
--   Devansh (da0017@mix.wvu.edu)
-
--   Changed from slabDists() and diskDist() to slabdist() and diskdist()
-    as needed for galacticops.py to work
--   Added unif and log_unif for pdist and lumdist working fine
--   Added dist_gen to generate from a given distribution.
--   Added unif for R and Z
-
-'''
 class PopulateException(Exception):
     pass
 
@@ -204,9 +193,9 @@ def generate(ngen,
             sys.exit()
         elif pop.pDistType == 'd_g':
             Pbin_num=dists.draw1d(dgf_pop_load['pHist'])
-            logPmin=dgf_pop_load['pBins'][0]
-            logPmax=dgf_pop_load['pBins'][-1]
-            p.period = logPmin + (logPmax-logPmin)*(Pbin_num+random.random())/len(dgf_pop_load['pHist'])
+            Pmin=dgf_pop_load['pBins'][0]
+            Pmax=dgf_pop_load['pBins'][-1]
+            p.period = Pmin + (Pmax-Pmin)*(Pbin_num+random.random())/len(dgf_pop_load['pHist'])
 
 #            p.period = dg.gen_nos(dgf_pop_load['pHist'],dgf_pop_load['pBins'])
         elif pop.pDistType == 'lorimer12':
@@ -282,9 +271,10 @@ def generate(ngen,
 
             elif pop.radialDistType == 'd_g':
                 Rbin_num=dists.draw1d(dgf_pop_load['RHist'])
-                logRmin=dgf_pop_load['RBins'][0]
-                logRmax=dgf_pop_load['RBins'][-1]
-                p.r0 = logRmin + (logRmax-logRmin)*(Rbin_num+random.random())/len(dgf_pop_load['RHist'])
+                Rmin=dgf_pop_load['RBins'][0]
+                Rmax=dgf_pop_load['RBins'][-1]
+                #p.r0 = dists.yet_another_try(dgf_pop_load['RHist'], dgf_pop_load['RBins'])
+                p.r0 = Rmin + (Rmax-Rmin)*(Rbin_num+random.random())/len(dgf_pop_load['RHist'])
             
             elif pop.radialDistType == 'yk04':
                 p.r0 = go.ykr()
@@ -343,9 +333,9 @@ def generate(ngen,
 			    		     pop.lumhigh)
         elif pop.lumDistType == 'd_g':
             lbin_num=dists.draw1d(dgf_pop_load['lHist'])
-            loglmin=dgf_pop_load['lBins'][0]
-            loglmax=dgf_pop_load['lBins'][-1]
-            logl = loglmin + (loglmax-loglmin)*(lbin_num+random.random())/len(dgf_pop_load['lHist'])
+            lmin=dgf_pop_load['lBins'][0]
+            lmax=dgf_pop_load['lBins'][-1]
+            logl = lmin + (lmax-lmin)*(lbin_num+random.random())/len(dgf_pop_load['lHist'])
             p.lum_1400 = 10.0**logl
         p.lum_inj_mu=p.lum_1400
 

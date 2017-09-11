@@ -3,7 +3,7 @@
 import sys
 import math
 import random
-
+import numpy as np
 
 def drawlnorm(mean, sigma):
     """Draw a random number from a log-normal distribution"""
@@ -36,7 +36,7 @@ def draw1d(dist):
         (dist is a list of numbers per bin)
     """
     # sum of distribution
-    total = sum(dist)
+    total = float(sum(dist))
     # cumulative distn
     cumulative = [sum(dist[:x+1])/total for x in range(len(dist))]
 

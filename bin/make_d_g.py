@@ -6,7 +6,6 @@ import cPickle
 import numpy as np
 import argparse 
 
-
 ## Arguments
 parser = argparse.ArgumentParser(description="Make the histrogram distrubtions for period, luminosity, Z and R.")
 parser.add_argument('-f', '--outfile', help='output distribution file', default='dist_gen')

@@ -10,10 +10,6 @@ def calc_cf(in_dist,compare_dist,bins):
             ret_val[i]=real[i]
         else:
             ret_val[i]= (real[i]-model[i])/model[i]
-#    ret_val= (real-model)/model
-#    print "real  : ", real
-#    print "model : ", model
-#    print "cf    : ", ret_val
     return ret_val
 
 def apply_cf(cf, dist):
@@ -24,6 +20,4 @@ def apply_cf(cf, dist):
             ret_pop[i]=cf[i]
         else:
             ret_pop[i]=dist[i] + dist[i]*cf[i]
-#    print "new dist : ", ret_pop
-#    ret_pop=dist + dist*cf
     return (ret_pop)
