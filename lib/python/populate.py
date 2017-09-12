@@ -45,6 +45,8 @@ def generate(ngen,
              orbits=False,
              dgf=None,
              singlepulse=False,
+             accelsearch=False,
+             jerksearch=False,
              sig_factor=10.0):
 
     """
@@ -350,7 +352,7 @@ def generate(ngen,
             [p.lum_sig]=sig_factor
         else:
             p.br=None
-
+        
         # if no surveys, just generate ngen pulsars
         if surveyList is None:
             pop.population.append(p)
@@ -374,11 +376,12 @@ def generate(ngen,
                         SNR = surv.SNRcalc(p, pop,rratssearch=True)
                     else:
                         SNR = -3
+                elif accelsearch:
+                    SNR = surv.SNRcalc(p, pop, accelsearch=True)
+                elif jerksearch:
+                    SNR = surv.SNRcalc(p, pop, jerksearch=True)
                 else:
-                    pop_time=None
-                    p.pulse_det_frac=None
                     SNR = surv.SNRcalc(p, pop, rratssearch=False)
-                #print SNR
 
                 if SNR > surv.SNRlimit:
                     # SNR is over threshold
@@ -641,7 +644,15 @@ if __name__ == '__main__':
                         help='TESTING: flag to generate orbital params')
 
     parser.add_argument('--singlepulse', nargs='?', const=True, default=False,
-                       help='Single Pulse SNR calc for surveys')
+                       help='Single Pulse SNR calc for surveys (def=False)')
+
+    parser.add_argument(
+        '--accel', nargs='?', const=True, default=False,
+        help='use accel search for MSPs (def=False)')
+
+    parser.add_argument(
+        '--jerk', nargs='?', const=True, default=False,
+        help='use accel & jerk search for MSPs (def=False)')
 
     args = parser.parse_args()
 
@@ -672,6 +683,8 @@ if __name__ == '__main__':
                    orbits=args.orbits,
                    dgf=args.dgf,
                    singlepulse=args.singlepulse,
+                   accelsearch=args.accel,
+                   jerksearch=args.jerk,
                    sig_factor=args.sig_factor
                    )
 
