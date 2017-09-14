@@ -84,7 +84,7 @@ def generate(ngen,
             sys.exit()
         dgf_pop_load = cPickle.load(f)
         f.close()
-
+    
     if lumDistType not in ['lnorm', 'pow', 'log_unif', 'd_g']:
         print "Unsupported luminosity distribution: {0}".format(lumDistType)
 
@@ -360,8 +360,10 @@ def generate(ngen,
             else:
                 p.br=_burst()
             [p.lum_sig]=sig_factor
+            p.det_nos=0
         else:
             p.br=None
+            p.det_nos=None
         
         # if no surveys, just generate ngen pulsars
         if surveyList is None:
@@ -380,8 +382,6 @@ def generate(ngen,
                 # do SNR calculation
                 if singlepulse:
                     pop_time = int(p.br*surv.tobs)
-                    p.lums=np.zeros(int(pop_time))
-                    p.pulse_det_frac=0.0
                     if pop_time >= 1.0:
                         SNR = surv.SNRcalc(p, pop,rratssearch=True)
                     else:

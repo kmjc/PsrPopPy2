@@ -158,7 +158,8 @@ class Population:
                     'n': 'Array Index',
                     'eta': 'Efficiency',
                     'edot': 'Edot',
-                    'br':'Burst Rate (s$^{-1}$)'
+                    'br': 'Burst Rate (s$^{-1}$)',
+                    'ndet': 'Number of detected pulses'
                     }
 
         dataDict = {
@@ -182,6 +183,7 @@ class Population:
             'eta': np.array([psr.efficiency() for psr in self.population]),
             'edot': np.array([psr.edot() for psr in self.population]),
             'br': np.array([psr.br for psr in self.population]),
+            'ndet':np.array([psr.det_nos for psr in self.population])
                     }
 
         return labelDict, dataDict, self.size()

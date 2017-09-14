@@ -22,10 +22,10 @@ nbins_b=20  # Burst Rate
 ## corr_var_hist = histogram values
 ## vare_pop = bin edges
 corr_p_hist,pe_pop=np.histogram(np.random.uniform(0.001, 8000.00, nbins_p**2),bins=nbins_p) 
-corr_l_hist,le_pop=np.histogram(np.random.uniform(1.500, 4.70, nbins_l**2),bins=nbins_l) 
+corr_l_hist,le_pop=np.histogram(np.random.uniform(1.500, 14.70, nbins_l**2),bins=nbins_l) 
 corr_R_hist,Re_pop=np.histogram(np.random.uniform(0.000, 12.3, nbins_R**2),bins=nbins_R) 
 corr_z_hist,Ze_pop=np.histogram(np.random.uniform(-1.06, 1.91, nbins_z**2),bins=nbins_z) 
-corr_b_hist,be_pop=np.histogram(10**np.random.normal(0.0,2.00, nbins_z**2),bins=nbins_z)
+corr_b_hist,be_pop=np.histogram(10**np.random.normal(-1.0,2.00, nbins_z**2),bins=nbins_z)
 
 ## Make dicts
 dataDict={'pHist':np.array(corr_p_hist), 'pBins':np.array(pe_pop), 'lHist':np.array(corr_l_hist), 'lBins':np.array(le_pop),\

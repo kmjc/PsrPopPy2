@@ -482,7 +482,7 @@ class Survey:
                     pulsar.det_nos=len(pulsar.det_pulses)
                 else:
                     pulsar.det_pulses=None
-                    pulsar.det_nos=None
+                    pulsar.det_nos=0
             else:
                 return -3
         # account for aperture array, if needed
