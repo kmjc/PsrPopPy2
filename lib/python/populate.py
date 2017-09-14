@@ -47,7 +47,8 @@ def generate(ngen,
              singlepulse=False,
              accelsearch=False,
              jerksearch=False,
-             sig_factor=10.0):
+             sig_factor=10.0,
+             brDistType='log_unif'):
 
     """
     Generate a population of pulsars.
@@ -70,9 +71,9 @@ def generate(ngen,
     nostdout -- (bool) switch off stdout
     """
     pop = Population()
-
+    
     # check that the distribution types are supported....
-    if 'd_g' in (pDistType,lumDistType,zscaleType,radialDistType)  and dgf == None:
+    if 'd_g' in (pDistType,lumDistType,zscaleType,radialDistType,brDistType) and dgf is None:
         print "Provide the distribution generation file"
         sys.exit()
     elif dgf != None:
@@ -86,6 +87,9 @@ def generate(ngen,
 
     if lumDistType not in ['lnorm', 'pow', 'log_unif', 'd_g']:
         print "Unsupported luminosity distribution: {0}".format(lumDistType)
+
+    if brDistType not in ['log_unif', 'd_g']:
+        print "Unsupported burst rate distribution: {0}".format(brDistType)
 
     if pDistType not in ['lnorm', 'norm', 'cc97', 'lorimer12','unif', 'd_g']:
         print "Unsupported period distribution: {0}".format(pDistType)
@@ -348,7 +352,13 @@ def generate(ngen,
 
         #define a burst rate if single pulse option is on
         if singlepulse:
-            p.br=_burst()
+            if brDistType == 'd_g':
+                brbin_num=dists.draw1d(dgf_pop_load['brHist'])
+                brmin=dgf_pop_load['brBins'][0]
+                brmax=dgf_pop_load['brBins'][-1]
+                p.br = brmin + (brmax-brmin)*(brbin_num+random.random())/len(dgf_pop_load['brHist'])
+            else:
+                p.br=_burst()
             [p.lum_sig]=sig_factor
         else:
             p.br=None
@@ -628,7 +638,7 @@ if __name__ == '__main__':
     parser.add_argument('-doublespec', type=float, nargs=2, required=False,
                         default=[None, None],
                         help='Dbl spec fraction and alpha value')
-    #dist_gen_file
+    # dist_gen_file
     parser.add_argument('-dgf', type=str,metavar='dist_gen_file', required= False,
                         default=None, help='File to generate distributions from')
 
@@ -636,16 +646,25 @@ if __name__ == '__main__':
     parser.add_argument('-o', type=str, metavar='outfile', required=False,
                         default='populate.model',
                         help='Output filename for population model')
-
+    # no std output
     parser.add_argument('--nostdout', nargs='?', const=True, default=False,
                         help='flag to switch off std output (def=False)')
 
+    # binaries! yay!
     parser.add_argument('--orbits', nargs='?', const=True, default=False,
                         help='TESTING: flag to generate orbital params')
-
+    
+    # let's detect single pulses
     parser.add_argument('--singlepulse', nargs='?', const=True, default=False,
                        help='Single Pulse SNR calc for surveys (def=False)')
 
+    # distrubtions for the burst rate
+    parser.add_argument('-brdist', type=str, nargs=1, required=False,
+                        default=['log_unif'],
+                        help='type of distrbution to use for burst rate',
+                        choices=['log_unif','d_g'])
+
+    # while we are the subject of binaries, why not accel and jerk search!
     parser.add_argument(
         '--accel', nargs='?', const=True, default=False,
         help='use accel search for MSPs (def=False)')
@@ -662,7 +681,6 @@ if __name__ == '__main__':
         f.write('\n')
 
     # run the code and write out a cPickle population class
-
     pop = generate(args.n,
                    surveyList=args.surveys,
                    pDistType=args.pdist[0],
@@ -685,7 +703,7 @@ if __name__ == '__main__':
                    singlepulse=args.singlepulse,
                    accelsearch=args.accel,
                    jerksearch=args.jerk,
-                   sig_factor=args.sig_factor
-                   )
+                   sig_factor=args.sig_factor,
+                   brDistType=args.brdist[0])
 
     pop.write(outf=args.o)
