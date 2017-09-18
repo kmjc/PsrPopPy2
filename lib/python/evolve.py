@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 import sys
 import argparse
@@ -7,7 +7,8 @@ import random
 
 import inspect
 import cPickle
-import scipy.integrate
+#import scipy.integrate
+from scipy import integrate
 import numpy as np
 
 import distributions as dists
@@ -29,7 +30,8 @@ class EvolveException(Exception):
 def generate(ngen,
              surveyList=None,
              age_max=1.0E9,
-             pDistPars=[.3, .15],
+             pDistPars=[0.3, 0.15],
+             pDistType = 'norm' ,           # P distirbution for MSPs (Lorimer et al. 2015)
              bFieldPars=[12.65, 0.55],
              birthVPars=[0.0, 180.],
              siDistPars=[-1.6, 0.35],
@@ -55,6 +57,7 @@ def generate(ngen,
     pop = Population()
 
     # set the parameters in the population object
+
     pop.pmean, pop.psigma = pDistPars
     pop.bmean, pop.bsigma = bFieldPars
 
@@ -144,12 +147,14 @@ def generate(ngen,
 
         # initial age for pulsar
         pulsar.age = random.random() * age_max
-
         # initial period
         pulsar.p0 = -1.
-        while pulsar.p0 <= 0.:
+        while (pulsar.p0 <= 0.):
+          if(pDistType == 'norm'):
             pulsar.p0 = random.gauss(pop.pmean, pop.psigma)
-
+          elif(pDistType == 'drl15'):
+            L_p0 = np.random.lognormal(mean = pop.pmean, sigma = pop.psigma)  
+            pulsar.p0 = np.exp(L_p0)/1000         # period in seconds
         # initial magnetic field (in Gauss)
         pulsar.bfield_init = 10**random.gauss(pop.bmean, pop.bsigma)
 
@@ -172,15 +177,22 @@ def generate(ngen,
             if pop.deathline:
                 bhattacharya_deathperiod_92(pulsar)
 
+        elif pop.spinModel == 'tk01':
+            spindown_tk01(pulsar)
+
+            # apply deathline if relevant
+            if pop.deathline:
+                bhattacharya_deathperiod_92(pulsar)
+ 
         elif pop.spinModel == 'cs06':
             # contopoulos and spitkovsky
             spindown_cs06(pulsar, pop)
 
         # if period > 10 seconds, just try a new one
-        if pulsar.period > 10000.0 or pulsar.period < 10.:
+        if pulsar.period > 10000.0 or pulsar.period < 1.5:
             continue
         # cut on pdot too - this doesn't help
-        if pulsar.pdot > 1.e-11 or pulsar.pdot < 1.e-18:
+        if pulsar.pdot > 1.e-11 or pulsar.pdot < 1.e-21:
             continue
 
         # define pulse width (default = 6% = 18 degrees)
@@ -366,12 +378,12 @@ def generate(ngen,
             print "    Number outside survey area = {0}".format(surv.nout)
 
     # save list of arguments into the pop
-    try:
-        argspec = inspect.getargspec(generate)
-        key_values = [(arg, locals()[arg]) for arg in argspec.args]
-        #pop.arguments = {key: value for (key, value) in key_values}
-    except SyntaxError:
-        pass
+    #try:
+    #    argspec = inspect.getargspec(generate)
+    #    key_values = [(arg, locals()[arg]) for arg in argspec.args]
+    #    pop.arguments = {key: value for (key, value) in key_values}
+    #except SyntaxError:
+     #   pass
 
     return pop
 
@@ -449,8 +461,7 @@ def alignpulsar(pulsar, pop):
         pulsar.coschi = random.random()
         chi = math.degrees(math.acos(pulsar.coschi))
         pulsar.sinchi_init = math.sin(math.radians(chi))
-        pulsar.sinchi = pulsar.sinchi_init * math.exp(
-            -pulsar.age/pop.alignTime)
+        pulsar.sinchi = pulsar.sinchi_init * math.exp(-pulsar.age/pop.alignTime)
         pulsar.chi = math.degrees(math.asin(pulsar.sinchi))
 
     else:
@@ -512,6 +523,7 @@ def spindown_fk06(pulsar):
 
     # calculate pdot
     pulsar.pdot = _pdot_fk06(pulsar, kprime)
+
 
 
 def _p_of_t_fk06(pulsar, kprime):
@@ -616,6 +628,21 @@ def _cs06_poft(x, a, n):
     return x**(n-2.0) / (1.0-a*x)
 
 
+
+
+# Defining a new spindown model based evolution of magnetic field and alignment
+def spindown_tk01(pulsar):
+
+  tau_a = 1e7*3.15569e7  # alignment timescale in seconds
+  tau_b = 4e6*3.15569e7  # field decay timescale
+  tau_d = tau_b*tau_a/(tau_b + tau_a)
+  k = 9.768E-40 # cgs again
+  age_s = pulsar.age*3.15569e7  # in seconds
+  pulsar.period = (np.sqrt(pow(pulsar.bfield_init,2)*k*tau_d*(1-np.exp(-2*age_s/tau_d)) + pow(pulsar.p0,2)))*1000
+  pulsar.pdot = np.exp(-2*age_s/tau_d)*pow(pulsar.bfield_init,2)*k*1000/pulsar.period
+
+
+
 def bhattacharya_deathperiod_92(pulsar):
     """
     Eq 8 in Ridley & Lorimer - but it's the deathline from
@@ -651,12 +678,18 @@ if __name__ == '__main__':
                         default=1.0E9,
                         help='maximum initial age of pulsars')
 
+    # period distribution type
+    parser.add_argument('-pdist', nargs=1,
+                        required=False, default=['drl15'],
+                        help='Type of distribution for periods',
+                        choices=['drl15','norm'])
+
     # period distribution
     parser.add_argument('-p', nargs=2, type=float,
-                        required=False, default=[0.3, 0.15],
+                        required=False, default=[1.5, 0.58],
                         help='mean and std dev of period distribution, secs \
-                                 (def = 0.3, 0.15)')
-
+                                 (def = 1.5, 0.58)')
+     
     # luminosity distribution parameters
     parser.add_argument('-ldist', nargs=1, required=False, default=['fk06'],
                         help='distribution to use for luminosities',
@@ -694,7 +727,7 @@ if __name__ == '__main__':
     # spindown model
     parser.add_argument('-spinmodel', type=str, required=False,
                         nargs=1, default=['fk06'],
-                        choices=['fk06', 'cs06'],
+                        choices=['fk06', 'cs06','tk01'],
                         help='spin-down model to employ')
 
     # alignment model
@@ -781,6 +814,7 @@ if __name__ == '__main__':
                    age_max=args.tmax,
                    lumDistType=args.ldist[0],
                    lumDistPars=args.l,
+                   pDistType =args.pdist[0],
                    pDistPars=args.p,
                    bFieldPars=args.b,
                    birthVModel=args.vmodel[0],
