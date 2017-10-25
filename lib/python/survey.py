@@ -12,7 +12,6 @@ import galacticops as go
 from population import Population
 import radiometer as rad
 import degradation
-import pylab as plt
 
 class SurveyException(Exception):
     pass
@@ -389,7 +388,7 @@ class Survey:
                 print "Population doesn't have a burst rate"
                 print "Use populate with --singlepulse"
                 sys.exit()
-            pulsar.pop_time=pulsar.br*self.tobs
+            pulsar.pop_time=np.random.poisson(pulsar.br*self.tobs)
         
 
         if pulsar.dead:
@@ -461,15 +460,15 @@ class Survey:
                                        delta)
         else:
             #find number of times the pulse will pop up!
-            pop_time=int(pulsar.br*self.tobs)
-            if pop_time >= 1.0:
-                pulse_snr=np.zeros(pop_time)
-                fluxes=np.zeros(pop_time)
+            #pop_time=int(pulsar.br*self.tobs)
+            if pulsar.pop_time >= 1.0:
+                pulse_snr=np.zeros(pulsar.pop_time)
+                fluxes=np.zeros(pulsar.pop_time)
                 lums=[]
                 mu=math.log10(pulsar.lum_inj_mu)
                 sig=mu/pulsar.lum_sig
                 # Draw from luminosity dist.
-                for burst_times in range(pop_time):
+                for burst_times in range(pulsar.pop_time):
                     pulsar.lum_1400=dist.drawlnorm(mu,sig)
                     lums.append(pulsar.lum_1400)
                     flux=self.calcflux(pulsar, pop.ref_freq)
