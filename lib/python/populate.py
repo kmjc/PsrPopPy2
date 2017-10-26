@@ -359,7 +359,7 @@ def generate(ngen,
                 p.br = 10**(brmin + (brmax-brmin)*(brbin_num+random.random())/len(dgf_pop_load['brHist']))
             else:
                 p.br=_burst()
-            p.lum_sig=(sig_factor[0])
+            p.lum_sig=sig_factor
             p.det_nos=0
         else:
             p.br=None
@@ -608,7 +608,7 @@ if __name__ == '__main__':
                         help='luminosity distribution mean and std dev \
                              (def = [-1.1, 0.9], Faucher-Giguere&Kaspi, 2006)')
     parser.add_argument('-sig_factor', nargs=1, required=False, type=float,
-                        default=[10.0],help="Sigma = mean/sig_factor")
+                        default=10.0,help="Sigma = mean/sig_factor")
 
 
     # radial distribution type
