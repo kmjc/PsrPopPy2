@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import os
-
+import subprocess
 import math
 import random
 
@@ -12,6 +12,7 @@ import ctypes as C
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 __libdir__ = os.path.dirname(__dir__)
 fortranpath = os.path.join(__libdir__, 'fortran')
+Cpath = os.path.join(__libdir__, 'C')
 
 ne2001lib = C.CDLL(os.path.join(fortranpath, 'libne2001.so'))
 ne2001lib.dm_.restype = C.c_float
@@ -116,7 +117,17 @@ def lmt85_dist_to_dm(dist, gl, gb):
                          C.byref(inpath),
                          C.byref(linpath))
 
+def ymw16_dist_to_dm(dist, gl, gb):
+    """ Use Yao Manchester Wang 2016 electron density model to get DM."""
+    """ Return distance in kpc"""
+    cmd=Cpath+'/ymw16 -d '+Cpath+'/ Gal %f %f %f %i'  % (gl,gb,dist*1000,2)
+    proc = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE)
+    output=[line.strip() for line in proc.stdout]
+    output=output[0].split(':')
+    dm=float(output[2].split('log')[0])
+    return(dm)
 
+    
 def ne2001_get_smtau(dist, gl, gb):
     """Use NE2001 model to get the DISS scattering timescale"""
     dist = C.c_float(dist)
@@ -386,3 +397,5 @@ def readtskyfile():
                 str_idx += 5
 
     return tskylist
+
+print ymw16_dist_to_dm(90,123,6.5)

@@ -98,7 +98,7 @@ def generate(ngen,
                               'slab', 'disk','unif' ,'gauss','d_g']:
         print "Unsupported radial distribution: {0}".format(radialDistType)
 
-    if electronModel not in ['ne2001', 'lmt85']:
+    if electronModel not in ['ne2001', 'lmt85','ymw16']:
         print "Unsupported electron model: {0}".format(electronModel)
 
     if pattern not in ['gaussian', 'airy']:
@@ -322,6 +322,8 @@ def generate(ngen,
             p.dm = go.ne2001_dist_to_dm(p.dtrue, p.gl, p.gb)
         elif pop.electronModel == 'lmt85':
             p.dm = go.lmt85_dist_to_dm(p.dtrue, p.gl, p.gb)
+        elif pop.electronModel == 'ymw16':
+            p.dm = go.ymw16_dist_to_dm(p.dtrue, p.gl, p.gb)
 
         p.scindex = scindex
         # then calc scatter time
@@ -627,7 +629,7 @@ if __name__ == '__main__':
     parser.add_argument('-dm', type=str, nargs=1, required=False,
                         default=['ne2001'],
                         help='Galactic electron distribution model to use',
-                        choices=['ne2001', 'lmt85'])
+                        choices=['ne2001', 'lmt85', 'ymw16'])
 
     # GPS sources
     parser.add_argument('-gps', type=float, nargs=2, required=False,
