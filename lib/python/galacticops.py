@@ -397,5 +397,3 @@ def readtskyfile():
                 str_idx += 5
 
     return tskylist
-
-print ymw16_dist_to_dm(90,123,6.5)
