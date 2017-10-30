@@ -35,6 +35,8 @@ class Pulsar(Orbit):
                  gpsA=None,
                  brokenFlag=0,
                  brokenSI=None,
+                 br=None,
+                 det_nos=None,
                  *args,
                  **kwargs):
         """___init___ function for the Pulsar class"""
@@ -77,6 +79,10 @@ class Pulsar(Orbit):
         self.brokenSI = brokenSI
 
         self.snr = snr
+
+        # added this for rrats
+        self.br = br
+        self.det_nos = det_nos
 
         # add this little flag which can be
         # switched if the pulsar is detected in any survey
