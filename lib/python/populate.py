@@ -45,6 +45,7 @@ def generate(ngen,
              orbits=False,
              dgf=None,
              singlepulse=False,
+             dither=False,
              accelsearch=False,
              jerksearch=False,
              sig_factor=10.0,
@@ -317,18 +318,6 @@ def generate(ngen,
 
         p.dtrue = go.calc_dtrue(p.galCoords)
 
-        # then calc DM  using fortran libs
-        if pop.electronModel == 'ne2001':
-            p.dm = go.ne2001_dist_to_dm(p.dtrue, p.gl, p.gb)
-        elif pop.electronModel == 'lmt85':
-            p.dm = go.lmt85_dist_to_dm(p.dtrue, p.gl, p.gb)
-        elif pop.electronModel == 'ymw16':
-            p.dm = go.ymw16_dist_to_dm(p.dtrue, p.gl, p.gb)
-
-        p.scindex = scindex
-        # then calc scatter time
-        p.t_scatter = go.scatter_bhat(p.dm, p.scindex)
-
         if pop.lumDistType == 'lnorm':
             p.lum_1400 = dists.drawlnorm(pop.lummean,
                                          pop.lumsigma)
@@ -351,6 +340,19 @@ def generate(ngen,
         if orbits:
             orbitalparams.test_1802_2124(p)
             print p.gb, p.gl
+        
+        #dither the distance
+        if dither:
+            # find flux
+            flux = p.lum_inj_mu/(p.dtrue**2)
+            # dithered distance
+            p.dtrue += np.fabs(random.gauss(0.0,p.dtrue))
+            # new luminosity
+            p.lum_1400 = flux*p.dtrue**2
+            p.lum_inj_mu=p.lum_1400
+            # new R and z
+            p.galCoords = go.lb_to_xyz(p.gl, p.gb, p.dtrue)
+            p.r0=np.sqrt(p.galCoords[0]**2 + p.galCoords[1]**2)
 
         #define a burst rate if single pulse option is on
         if singlepulse:
@@ -366,6 +368,18 @@ def generate(ngen,
         else:
             p.br=None
             p.det_nos=None
+
+        # then calc DM  using fortran libs
+        if pop.electronModel == 'ne2001':
+            p.dm = go.ne2001_dist_to_dm(p.dtrue, p.gl, p.gb)
+        elif pop.electronModel == 'lmt85':
+            p.dm = go.lmt85_dist_to_dm(p.dtrue, p.gl, p.gb)
+        elif pop.electronModel == 'ymw16':
+            p.dm = go.ymw16_dist_to_dm(p.dtrue, p.gl, p.gb)
+
+        p.scindex = scindex
+        # then calc scatter time
+        p.t_scatter = go.scatter_bhat(p.dm, p.scindex)
         
         # if no surveys, just generate ngen pulsars
         if surveyList is None:
@@ -660,6 +674,10 @@ if __name__ == '__main__':
     parser.add_argument('--singlepulse', nargs='?', const=True, default=False,
                        help='Single Pulse SNR calc for surveys (def=False)')
 
+    # dither thy distance!
+    parser.add_argument('--dither', nargs='?', const=True, default=False,
+                   help='Dither the distance (def=False)')
+
     # distrubtions for the burst rate
     parser.add_argument('-brdist', type=str, nargs=1, required=False,
                         default=['log_unif'],
@@ -703,6 +721,7 @@ if __name__ == '__main__':
                    orbits=args.orbits,
                    dgf=args.dgf,
                    singlepulse=args.singlepulse,
+                   dither=args.dither,
                    accelsearch=args.accel,
                    jerksearch=args.jerk,
                    sig_factor=args.sig_factor,
