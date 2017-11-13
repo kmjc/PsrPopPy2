@@ -346,7 +346,7 @@ def generate(ngen,
             # find flux
             flux = p.lum_inj_mu/(p.dtrue**2)
             # dithered distance
-            p.dtrue += np.fabs(random.gauss(0.0,p.dtrue))
+            p.dtrue += random.gauss(0.0,0.2*p.dtrue)
             # new luminosity
             p.lum_1400 = flux*p.dtrue**2
             p.lum_inj_mu=p.lum_1400

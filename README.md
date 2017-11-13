@@ -4,10 +4,10 @@ PsrPopPy2
 
 2nd Version
 -----------
-Added rrat generation and detection part.
+Added rrat generation and detection part and much more!
 
 To use single pulse snr use --singlepulse in populate and dosurvey. This will also generate a burst-rate based on a uniform distrubution.
-(eg. populate -n 1000 -pdist d_g -dgf corr_pops -ldist d_g -zdist d_g -rdist d_g -zdist d_g -brdist d_g -surveys PMSURV --singlepulse -dm ymw16)
+(eg. populate -n 1000 -pdist d_g -dgf corr_pops -ldist d_g -zdist d_g -rdist d_g -zdist d_g -brdist d_g -surveys PMSURV --singlepulse -dm ymw16 --dither)
 
 
 Additions
@@ -15,6 +15,7 @@ Additions
 2. Single Pulse SNR and Burst Rate for Radio Transients (use --singlepulse in populate and dosurvey)
 3. wxHist and wxView now support burst rate and number of detected pulses for singlepulse case.
 4. ymw16 dm model now included
+5. Now dither the distnces using --dither option. See lorimer et al 2006 section 4.2.
 
 
 Old Info
