@@ -346,6 +346,7 @@ def generate(ngen,
             # find flux
             flux = p.lum_inj_mu/(p.dtrue**2)
             # dithered distance
+            p.dold = p.dtrue
             p.dtrue += random.gauss(0.0,0.2*p.dtrue)
             # new luminosity
             p.lum_1400 = flux*p.dtrue**2
@@ -363,7 +364,7 @@ def generate(ngen,
                 p.br = 10**(brmin + (brmax-brmin)*(brbin_num+random.random())/len(dgf_pop_load['brHist']))
             else:
                 p.br=_burst()
-            p.lum_sig=sig_factor
+            p.lum_sig=sig_factor[0]
             p.det_nos=0
         else:
             p.br=None
