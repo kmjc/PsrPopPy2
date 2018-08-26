@@ -17,6 +17,7 @@ import dist_gen as dg
 from population import Population
 from pulsar import Pulsar
 from survey import Survey
+import scipy.stats as stats
 
 from progressbar import ProgressBar
 
@@ -86,7 +87,7 @@ def generate(ngen,
         dgf_pop_load = cPickle.load(f)
         f.close()
     
-    if lumDistType not in ['lnorm', 'pow', 'log_unif', 'd_g']:
+    if lumDistType not in ['lnorm', 'pow', 'log_unif', 'd_g', 'log_st']:
         print "Unsupported luminosity distribution: {0}".format(lumDistType)
 
     if brDistType not in ['log_unif', 'd_g']:
@@ -96,7 +97,7 @@ def generate(ngen,
         print "Unsupported period distribution: {0}".format(pDistType)
     
     if radialDistType not in ['lfl06', 'yk04', 'isotropic',
-                              'slab', 'disk','unif' ,'gauss','d_g']:
+                              'slab', 'disk','unif' ,'gauss','d_g', 'gamma']:
         print "Unsupported radial distribution: {0}".format(radialDistType)
 
     if electronModel not in ['ne2001', 'lmt85','ymw16']:
@@ -127,6 +128,12 @@ def generate(ngen,
     elif pop.lumDistType == 'log_unif':
         pop.lumlow, pop.lumhigh = \
                 lumDistPars[0], lumDistPars[1]
+    elif pop.lumDistType == 'log_st':
+        try:
+            pop.lumlow, pop.lumhigh, pop.lumslope = \
+                    lumDistPars[0], lumDistPars[1], lumDistPars[2]
+        except ValueError:
+            raise PopulateException('Not enough lum distn parameters')
     elif pop.lumDistType == 'd_g':
         pass
     else:
@@ -214,6 +221,13 @@ def generate(ngen,
             width = (float(duty_percent)/100.) * p.period**0.9
             width = math.log10(width)
             width = dists.drawlnorm(width, 0.3)
+            
+            # following are the numbers for the RRATs
+            # from the period pulse width relation
+            if singlepulse:
+                A1=random.gauss(0.49986684,0.13035004)
+                A2=random.gauss(-0.77626305,0.4222085)
+                width = 10**(A1*math.log10(p.period)+ A2)
 
             p.width_degree = width*360./p.period
         else:
@@ -276,6 +290,11 @@ def generate(ngen,
             if pop.radialDistType == 'lfl06':
                 p.r0 = go.lfl06()
 
+            elif pop.radialDistType == 'gamma':
+                fit_alpha, fit_loc, fit_beta=1050.312227, -8.12315263841, 0.00756010693478
+                p.r0 = 8.5*stats.gamma.rvs(fit_alpha, loc=fit_loc, scale=fit_beta, size=1) + 8.5
+
+
             elif pop.radialDistType == 'd_g':
                 Rbin_num=dists.draw1d(dgf_pop_load['RHist'])
                 Rmin=dgf_pop_load['RBins'][0]
@@ -325,9 +344,15 @@ def generate(ngen,
             p.lum_1400 = dists.powerlaw(pop.lummin,
                                         pop.lummax,
                                         pop.lumpow)
+        elif pop.lumDistType == 'log_st':
+            low_lim=pop.lumlow
+            upr_lim=pop.lumhigh
+            slope = pop.lumslope #-0.10227965
+            p.lum_1400= 10.0**(low_lim + dists.st_line(slope,(upr_lim-low_lim)))
+
         elif pop.lumDistType == 'log_unif':
-            p.lum_1400 = 10.0**dists.uniform(pop.lumlow,
-			    		     pop.lumhigh)
+            p.lum_1400 = 10.0**dists.uniform(pop.lumlow,pop.lumhigh)
+
         elif pop.lumDistType == 'd_g':
             lbin_num=dists.draw1d(dgf_pop_load['lHist'])
             lmin=dgf_pop_load['lBins'][0]
@@ -619,9 +644,10 @@ if __name__ == '__main__':
     # luminosity distribution parameters
     parser.add_argument('-ldist', nargs=1, required=False, default=['lnorm'],
                         help='distribution to use for luminosities',
-                        choices=['lnorm', 'pow', 'log_unif', 'd_g'])
+                        choices=['lnorm', 'pow', 'log_unif', 'd_g', 'log_st'])
+
     parser.add_argument('-l', nargs='+', required=False, type=float,
-                        default=[-1.1, 0.9],
+                        default=[-1.1, 0.9, 0.0],
                         help='luminosity distribution mean and std dev \
                              (def = [-1.1, 0.9], Faucher-Giguere&Kaspi, 2006)')
     parser.add_argument('-sig_factor', required=False, type=float,
@@ -633,7 +659,7 @@ if __name__ == '__main__':
                         default=['lfl06'],
                         help='type of distrbution to use for Galactic radius',
                         choices=['lfl06', 'yk04', 'isotropic', 'slab',
-                                 'disk', 'gauss','unif','d_g'])
+                                 'disk', 'gauss','unif','d_g', 'gamma'])
 
     parser.add_argument('-r', required=False,
                         default=7.5, type=float,
