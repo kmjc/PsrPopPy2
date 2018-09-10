@@ -225,9 +225,11 @@ def generate(ngen,
             # following are the numbers for the RRATs
             # from the period pulse width relation
             if singlepulse:
-                A1=random.gauss(0.49986684,0.13035004)
-                A2=random.gauss(-0.77626305,0.4222085)
-                width = 10**(A1*math.log10(p.period)+ A2)
+                width = 1000
+                while width > 100:
+                    A1=random.gauss(0.49986684,0.13035004)
+                    A2=random.gauss(-0.77626305,0.4222085)
+                    width = 10**(A1*math.log10(p.period)+ A2)
 
             p.width_degree = width*360./p.period
         else:
