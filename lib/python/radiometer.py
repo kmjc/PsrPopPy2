@@ -67,7 +67,7 @@ def signalterm(beta,
     return beta * (Trec+Tsky) * math.sqrt(dterm) \
         / gain / math.sqrt(n_p * t_obs * bw)
 
-def single_pulse_snr(n_p,bw,duty,T_sys,gain,S_max):
+def single_pulse_snr(n_p,bw,duty,T_sys,gain,S_max,beta):
     eta=0.868
     S_sys=T_sys/gain
-    return(eta*math.sqrt(n_p*bw*duty)*S_max/S_sys)
+    return(eta*math.sqrt(n_p*bw*duty)*S_max/(S_sys*beta))

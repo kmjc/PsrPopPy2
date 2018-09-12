@@ -473,7 +473,7 @@ class Survey:
                     lums.append(pulsar.lum_1400)
                     flux=self.calcflux(pulsar, pop.ref_freq)
                     fluxes[burst_times]=flux
-                    pulse_snr[burst_times] = rad.single_pulse_snr(self.npol,self.bw,weff_ms,self.tsys,self.gain,flux)
+                    pulse_snr[burst_times] = rad.single_pulse_snr(self.npol,self.bw,weff_ms*1e-3,(self.tsys+ self.tskypy(pulsar)),self.gain,flux,self.beta)
                 pulsar.lum_1400=np.max(lums)
                 sig_to_noise = np.max(pulse_snr)
                 if sig_to_noise >= self.SNRlimit:
@@ -498,7 +498,7 @@ class Survey:
                                            1)
             elif accelsearch:
                 print "accel"
-                gamma = degradation.gamma2(pulsar,
+                gamma = degaadation.gamma2(pulsar,
                                            self.tobs,
                                            1)
             else:
