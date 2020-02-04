@@ -37,7 +37,7 @@ class Pulsar(Orbit):
                  brokenSI=None,
                  br=None,
                  det_nos=None,
-                 orb_degfac = 1.0  #Add in orbital degradation factor for each pulsar
+                 orb_degfac = 1.0,  #Add in orbital degradation factor for each pulsar
                  *args,
                  **kwargs):
         """___init___ function for the Pulsar class"""
