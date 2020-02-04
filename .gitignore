@@ -1,2 +1,5 @@
 *.so
 *.pyc
+*.o
+*.model
+*.cmd

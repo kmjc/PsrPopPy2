@@ -1,4 +1,4 @@
-include makefile.$(OSTYPE)
+include makefile.linux
 
 all: libne2001.so libykarea.so libsla.so libvxyz.so libgamma.so
 
