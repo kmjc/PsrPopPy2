@@ -6,7 +6,6 @@ import math
 import random
 
 import inspect
-import cPickle
 
 import numpy as np 
 import distributions as dists
@@ -20,6 +19,11 @@ from survey import Survey
 import scipy.stats as stats
 
 from progressbar import ProgressBar
+
+if sys.version_info[0] < 3:
+    import cPickle
+else:
+    import pickle as cPickle
 
 class PopulateException(Exception):
     pass

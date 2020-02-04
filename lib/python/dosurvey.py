@@ -5,12 +5,14 @@ import argparse
 import math
 import random
 
-import cPickle
-
 from population import Population
 from pulsar import Pulsar
 from survey import Survey
 
+if sys.version_info[0] < 3:
+    import cPickle
+else:
+    import pickle as cPickle
 
 class Detections:
     """Just a simple object to store survey detection summary"""

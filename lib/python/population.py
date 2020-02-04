@@ -1,10 +1,13 @@
 #!/usr/bin/python
 
-import copy
-import cPickle
+import copy, sys
 
 import numpy as np
 
+if sys.version_info[0] < 3:
+    import cPickle
+else:
+    import pickle as cPickle
 
 class Population:
 

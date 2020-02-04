@@ -6,7 +6,6 @@ import math
 import random
 
 import inspect
-import cPickle
 #import scipy.integrate
 from scipy import integrate
 import numpy as np
@@ -22,6 +21,10 @@ from survey import Survey
 
 from progressbar import ProgressBar
 
+if sys.version_info[0] < 3:
+    import cPickle
+else:
+    import pickle as cPickle
 
 class EvolveException(Exception):
     pass
