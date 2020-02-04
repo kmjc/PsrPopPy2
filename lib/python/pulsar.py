@@ -37,6 +37,7 @@ class Pulsar(Orbit):
                  brokenSI=None,
                  br=None,
                  det_nos=None,
+                 orb_degfac = 1.0  #Add in orbital degradation factor for each pulsar
                  *args,
                  **kwargs):
         """___init___ function for the Pulsar class"""
@@ -90,6 +91,9 @@ class Pulsar(Orbit):
 
         # need to add pulsar dead/alive for evolution code
         self.dead = False
+        
+        #Set the orbital degradation factor:
+        self.orb_degfac = orb_degfac
 
     # methods to calculate derived properties
     def s_1400(self):
