@@ -80,38 +80,38 @@ def generate(ngen,
     
     # check that the distribution types are supported....
     if 'd_g' in (pDistType,lumDistType,zscaleType,radialDistType,brDistType) and dgf is None:
-        print "Provide the distribution generation file"
+        print("Provide the distribution generation file")
         sys.exit()
     elif dgf != None:
         try:
             f = open(dgf, 'rb')
         except IOError:
-            print "Could not open file {0}.".format(dgf)
+            print("Could not open file {0}.".format(dgf))
             sys.exit()
         dgf_pop_load = cPickle.load(f)
         f.close()
     
     if lumDistType not in ['lnorm', 'pow', 'log_unif', 'd_g', 'log_st']:
-        print "Unsupported luminosity distribution: {0}".format(lumDistType)
+        print("Unsupported luminosity distribution: {0}".format(lumDistType))
 
     if brDistType not in ['log_unif', 'd_g']:
-        print "Unsupported burst rate distribution: {0}".format(brDistType)
+        print("Unsupported burst rate distribution: {0}".format(brDistType))
 
     if pDistType not in ['lnorm', 'norm', 'cc97', 'lorimer12','unif', 'd_g']:
-        print "Unsupported period distribution: {0}".format(pDistType)
+        print("Unsupported period distribution: {0}".format(pDistType))
     
     if radialDistType not in ['lfl06', 'yk04', 'isotropic',
                               'slab', 'disk','unif' ,'gauss','d_g', 'gamma']:
-        print "Unsupported radial distribution: {0}".format(radialDistType)
+        print("Unsupported radial distribution: {0}".format(radialDistType))
 
     if electronModel not in ['ne2001', 'lmt85','ymw16']:
-        print "Unsupported electron model: {0}".format(electronModel)
+        print("Unsupported electron model: {0}".format(electronModel))
 
     if pattern not in ['gaussian', 'airy']:
-        print "Unsupported gain pattern: {0}".format(pattern)
+        print("Unsupported gain pattern: {0}".format(pattern))
 
     if duty_percent < 0.:
-        print "Unsupported value of duty cycle: {0}".format(duty_percent)
+        print("Unsupported value of duty cycle: {0}".format(duty_percent))
 
     # need to use properties in this class so they're get/set-type props
     pop.pDistType = pDistType
@@ -159,7 +159,7 @@ def generate(ngen,
         pass
 
     if not nostdout:
-        print "\tGenerating pulsars with parameters:"
+        print("\tGenerating pulsars with parameters:")
         param_string_list = []
         for key, value in key_values:
             s = ": ".join([key, str(value)])
@@ -167,7 +167,7 @@ def generate(ngen,
 
         # join this list of strings, and print it
         s = "\n\t\t".join(param_string_list)
-        print "\t\t{0}".format(s)
+        print("\t\t{0}".format(s))
 
         # set up progress bar for fun :)
         prog = ProgressBar(min_value=0,
@@ -207,7 +207,7 @@ def generate(ngen,
         elif pop.pDistType == 'cc97':
             p.period = _cc97()
         elif pop.pDistType == 'gamma':
-            print "Gamma function not yet supported"
+            print("Gamma function not yet supported")
             sys.exit()
         elif pop.pDistType == 'd_g':
             Pbin_num=dists.draw1d(dgf_pop_load['pHist'])
@@ -370,7 +370,7 @@ def generate(ngen,
         # add in orbital parameters
         if orbits:
             orbitalparams.test_1802_2124(p)
-            print p.gb, p.gl
+            print(p.gb, p.gl)
         
         #dither the distance
         if dither:
@@ -419,7 +419,7 @@ def generate(ngen,
             pop.ndet += 1
             if not nostdout:
                 prog.increment_amount()
-                print prog, '\r',
+                print(prog, '\r',)
                 sys.stdout.flush()
         # if surveys are given, check if pulsar detected or not
         # in ANY of the surveys
@@ -478,24 +478,24 @@ def generate(ngen,
                 pop.ndet += 1
                 if not nostdout:
                     prog.increment_amount()
-                    print prog, '\r',
+                    print(prog, '\r',)
                     sys.stdout.flush()
 
     # print info to stdout
     if not nostdout:
-        print "\n"
-        print "  Total pulsars = {0}".format(len(pop.population))
-        print "  Total detected = {0}".format(pop.ndet)
+        print("\n")
+        print("  Total pulsars = {0}".format(len(pop.population)))
+        print("  Total detected = {0}".format(pop.ndet))
         # print "  Number not beaming = {0}".format(surv.nnb)
 
         for surv in surveys:
-            print "\n  Results for survey '{0}'".format(surv.surveyName)
-            print "    Number detected = {0}".format(surv.ndet)
-            print "    Number too faint = {0}".format(surv.ntf)
-            print "    Number smeared = {0}".format(surv.nsmear)
-            print "    Number outside survey area = {0}".format(surv.nout)
+            print("\n  Results for survey '{0}'".format(surv.surveyName))
+            print("    Number detected = {0}".format(surv.ndet))
+            print("    Number too faint = {0}".format(surv.ntf))
+            print("    Number smeared = {0}".format(surv.nsmear))
+            print("    Number outside survey area = {0}".format(surv.nout))
             if singlepulse:
-                print "    Number didn't burst =  {0}".format(surv.nbr)
+                print("    Number didn't burst =  {0}".format(surv.nbr))
 
     return pop
 
