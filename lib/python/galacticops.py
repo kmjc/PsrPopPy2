@@ -11,16 +11,16 @@ import ctypes as C
 # get the FORTRAN libraries
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 __libdir__ = os.path.dirname(__dir__)
-fortranpath = bytes(os.path.join(__libdir__, 'fortran').encode("ascii"))
-Cpath = bytes(os.path.join(__libdir__, 'C').encode("ascii"))
+fortranpath = os.path.join(__libdir__, 'fortran').encode()
+Cpath = os.path.join(__libdir__, 'C').encode()
 
-ne2001lib = C.CDLL(os.path.join(fortranpath, bytes('libne2001.so'.encode("ascii"))))
+ne2001lib = C.CDLL(os.path.join(fortranpath, 'libne2001.so'.encode()))
 ne2001lib.dm_.restype = C.c_float
 
-slalib = C.CDLL(os.path.join(fortranpath, bytes('libsla.so'.encode("ascii"))))
-vxyzlib = C.CDLL(os.path.join(fortranpath, bytes('libvxyz.so'.encode("ascii"))))
+slalib = C.CDLL(os.path.join(fortranpath, 'libsla.so'.encode()))
+vxyzlib = C.CDLL(os.path.join(fortranpath, 'libvxyz.so'.encode()))
 
-yklib = C.CDLL(os.path.join(fortranpath, bytes('libykarea.so'.encode("ascii"))))
+yklib = C.CDLL(os.path.join(fortranpath, 'libykarea.so'.encode()))
 yklib.ykr_.restype = C.c_float
 yklib.llfr_.restype = C.c_float
 
@@ -384,7 +384,7 @@ def _double_sided_exp(scale, origin=0.0):
 def readtskyfile():
     """Read in tsky.ascii into a list from which temps can be retrieved"""
 
-    tskypath = os.path.join(fortranpath, bytes('lookuptables/tsky.ascii'.encode("ascii")))
+    tskypath = os.path.join(fortranpath, 'lookuptables/tsky.ascii'.encode())
     tskylist = []
     with open(tskypath) as f:
         for line in f:
