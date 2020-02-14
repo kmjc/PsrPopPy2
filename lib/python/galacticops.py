@@ -210,8 +210,9 @@ def radec_to_lb(ra, dec):
     return l.value, b.value
 
 
-def xyz_to_lb((x, y, z)):
+def xyz_to_lb(cart_pos):
     """ Convert galactic xyz in kpc to l and b in degrees."""
+    x, y, z = cart_pos
     rsun = 8.5  # kpc
 
     # distance to pulsar
