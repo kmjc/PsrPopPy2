@@ -93,8 +93,8 @@ def run(pop,
 
     # print the population
     if not nostdout:
-        print "Running doSurvey on population..."
-        print pop
+        print("Running doSurvey on population...")
+        print(pop)
 
     # loop over the surveys we want to run on the pop file
     surveyPops = []
@@ -102,7 +102,7 @@ def run(pop,
         s = Survey(surv)
         s.discoveries = 0
         if not nostdout:
-            print "\nRunning survey {0}".format(surv)
+            print("\nRunning survey {0}".format(surv))
 
         # create a new population object to store discovered pulsars in
         survpop = Population()
@@ -154,15 +154,15 @@ def run(pop,
 
         # report the results
         if not nostdout:
-            print "Total pulsars in model = {0}".format(len(pop.population))
-            print "Number detected by survey {0} = {1}".format(surv, ndet)
-            print "Of which are discoveries = {0}".format(s.discoveries)
-            print "Number too faint = {0}".format(ntf)
-            print "Number smeared = {0}".format(nsmear)
-            print "Number out = {0}".format(nout)
+            print("Total pulsars in model = {0}".format(len(pop.population)))
+            print("Number detected by survey {0} = {1}".format(surv, ndet))
+            print("Of which are discoveries = {0}".format(s.discoveries))
+            print("Number too faint = {0}".format(ntf))
+            print("Number smeared = {0}".format(nsmear))
+            print("Number out = {0}".format(nout))
             if rratssearch:
-                print "Number didn't burst = {0}".format(nbr)
-            print "\n"
+                print("Number didn't burst = {0}".format(nbr))
+            print("\n")
 
         d = Detections(ndet=ndet,
                        ntf=ntf,
