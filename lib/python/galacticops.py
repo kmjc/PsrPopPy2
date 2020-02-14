@@ -11,16 +11,16 @@ import ctypes as C
 # get the FORTRAN libraries
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 __libdir__ = os.path.dirname(__dir__)
-fortranpath = os.path.join(__libdir__, 'fortran')
-Cpath = os.path.join(__libdir__, 'C')
+fortranpath = bytes(os.path.join(__libdir__, 'fortran').encode("ascii"))
+Cpath = bytes(os.path.join(__libdir__, 'C').encode("ascii"))
 
-ne2001lib = C.CDLL(os.path.join(fortranpath, 'libne2001.so'))
+ne2001lib = C.CDLL(os.path.join(fortranpath, bytes('libne2001.so'.encode("ascii"))))
 ne2001lib.dm_.restype = C.c_float
 
-slalib = C.CDLL(os.path.join(fortranpath, 'libsla.so'))
-vxyzlib = C.CDLL(os.path.join(fortranpath, 'libvxyz.so'))
+slalib = C.CDLL(os.path.join(fortranpath, bytes('libsla.so'.encode("ascii"))))
+vxyzlib = C.CDLL(os.path.join(fortranpath, bytes('libvxyz.so'.encode("ascii"))))
 
-yklib = C.CDLL(os.path.join(fortranpath, 'libykarea.so'))
+yklib = C.CDLL(os.path.join(fortranpath, bytes('libykarea.so'.encode("ascii"))))
 yklib.ykr_.restype = C.c_float
 yklib.llfr_.restype = C.c_float
 
