@@ -152,8 +152,10 @@ def generate(ngen,
 
     # store the dict of arguments inside the model. Could be useful.
     try:
-        argspec = inspect.getargspec(generate)
-        key_values = [(arg, locals()[arg]) for arg in argspec.args]
+        argspec = inspect.getfullargspec(generate)
+        lcl = locals()
+        key_values = [(arg, lcl[arg]) for arg in argspec.args]
+        #key_values = [(arg, locals()['argspec'][arg]) for arg in argspec.args]
         #pop.arguments = {key: value for (key, value) in key_values}
     except SyntaxError:
         pass
