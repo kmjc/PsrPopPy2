@@ -384,7 +384,7 @@ def _double_sided_exp(scale, origin=0.0):
 def readtskyfile():
     """Read in tsky.ascii into a list from which temps can be retrieved"""
 
-    tskypath = os.path.join(fortranpath, 'lookuptables/tsky.ascii')
+    tskypath = os.path.join(fortranpath, bytes('lookuptables/tsky.ascii'.encode("ascii")))
     tskylist = []
     with open(tskypath) as f:
         for line in f:
