@@ -63,8 +63,9 @@ def vxyz(pulsar):
     pulsar.vz = vz.value
 
 
-def calc_dtrue((x, y, z)):
-    """Calculate true distance to pulsar from the sun."""
+def calc_dtrue(cart_pos):
+    """Calculate true distance to pulsar from the sun. ip cart_pos should be tuple with (x,y,z)"""
+    x, y, z = cart_pos
     rsun = 8.5  # kpc
     return math.sqrt(x*x + (y-rsun)*(y-rsun) + z*z)
 
