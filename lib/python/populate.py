@@ -152,7 +152,10 @@ def generate(ngen,
 
     # store the dict of arguments inside the model. Could be useful.
     try:
-        argspec = inspect.getfullargspec(generate)
+        if sys.version_info[0] > 3:
+            argspec = inspect.getfullargspec(generate)
+        else:
+            argspec = inspect.getargspec(generate)
         lcl = locals()
         key_values = [(arg, lcl[arg]) for arg in argspec.args]
         #key_values = [(arg, locals()['argspec'][arg]) for arg in argspec.args]
