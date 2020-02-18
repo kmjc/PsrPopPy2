@@ -58,4 +58,4 @@ def draw_double_sided_exp(scale, origin=0.0):
 
 def uniform(low,high):
 	"""Draw a random number from a uniform distribution between low and high"""
-	return random.uniform(low,high)
+	return 10 ** random.uniform(np.log10(low),np.log10(high))
