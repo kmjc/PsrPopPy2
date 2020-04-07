@@ -37,6 +37,13 @@ class Pulsar(Orbit):
                  brokenSI=None,
                  br=None,
                  det_nos=None,
+                 m = 1, # "n"th harmonic; required for orb_degfac calculation
+                 m1 = 1.4, #Mass of psr; required for orb_degfac calculation
+                 m2 = 1.4, #Mass of companion; required for orb_degfac calculation
+                 om = 90., #angle of periastron passage (omega_per); required for orb_degfac calculation
+                 inc = 90., #inclincation of bns system; required for orb_degfac calculation
+                 ec = 0.01, #eccentricity of bns system; required for orb_degfac calculation
+                 pod = 0.1, #orbital period of bns system; required for orb_degfac calculation
                  orb_degfac = 1.0,  #Add in orbital degradation factor for each pulsar
                  *args,
                  **kwargs):
@@ -92,6 +99,15 @@ class Pulsar(Orbit):
 
         # need to add pulsar dead/alive for evolution code
         self.dead = False
+        
+        #Set the orbital parameters:
+        self.m = m
+        self.m1 = m1
+        self.m2 = m2
+        self.om = om
+        self.inc = inc
+        self.ec = ec
+        self.pod = pod
         
         #Set the orbital degradation factor:
         self.orb_degfac = orb_degfac

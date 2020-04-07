@@ -29,6 +29,8 @@ class Population:
                  gpsA=None,
                  brokenFrac=None,
                  brokenSI=None,
+                 bns = False,
+                 orbparams = {},
                  ref_freq=1400.0):
 
         """Initialise the population object."""
@@ -55,7 +57,11 @@ class Population:
         self.zscale = zscale
 
         self.ref_freq = ref_freq
-
+        
+        #Set whether we are looking at BNS systems:
+        self.bns = bns
+        self.orbparams = orbparams
+        
         # GPS and double SI values
         self.gpsFrac = gpsFrac
         self.gpsA = gpsA

@@ -54,6 +54,8 @@ def generate(ngen,
              accelsearch=False,
              jerksearch=False,
              sig_factor=10.0,
+             bns = False,
+             orbparams = {'m': [1, 5], 'm1': [1.0, 2.4], 'm2': [0.2, 1e9], 'om': [0, 360.], 'inc': [0, 90], 'ec': [0., 1.], 'pod': [1e-3, 1e3]},
              brDistType='log_unif'):
 
     """
@@ -125,6 +127,10 @@ def generate(ngen,
 
     pop.gpsFrac, pop.gpsA = gpsArgs
     pop.brokenFrac, pop.brokenSI = doubleSpec
+    
+    #Set whether system is BNS:
+    pop.bns = bns
+    pop.orbparams = orbparams
 
     if pop.lumDistType == 'lnorm':
         pop.lummean, pop.lumsigma = \
@@ -371,11 +377,32 @@ def generate(ngen,
             logl = lmin + (lmax-lmin)*(lbin_num+random.random())/len(dgf_pop_load['lHist'])
             p.lum_1400 = 10.0**logl
         p.lum_inj_mu=p.lum_1400
-
+        
         # add in orbital parameters
-        if orbits:
-            orbitalparams.test_1802_2124(p)
-            print(p.gb, p.gl)
+        if pop.bns:
+            
+            assert isinstance(orbparams, dict), "Orbital parameter distribution limits should be a dictionary of form {'name of orb_param': [min, max]}"
+            
+            #These represents the range in which NN was trained. 
+            #DO NOT GO OUTSIDE THESE BOUNDS!!
+            default_orbparams = {'m': [1, 5], 'm1': [1.0, 2.4], 'm2': [0.2, 1e9], 'om': [0, 360.], 'inc': [0, 90], 'ec': [0., 1.], 'pod': [1e-3, 1e3]}
+            
+            if len(pop.orbparams) == 0: 
+                print("Warning: Supplied orbparams dict is empty; Setting ranges to default")
+                pop.orbparams = default_orbparams
+            else:
+                temp_opd = dict(default_orbparams)
+                temp_opd.update(orbparams)
+                pop.orbparams = temp_opd
+            
+            #Draw a value for each of the orbital parameters from a uniform distribution
+            p.m = np.int(np.random.uniform(pop.orbparams['m'][0], pop.orbparams['m'][1], size = 1)) #Should typically fix this to one value!
+            p.m1 = np.random.uniform(pop.orbparams['m1'][0], pop.orbparams['m1'][1], size = 1)
+            p.m2 = np.random.uniform(pop.orbparams['m2'][0], pop.orbparams['m2'][1], size = 1)
+            p.om = np.random.uniform(pop.orbparams['om'][0], pop.orbparams['om'][1], size = 1)
+            p.inc = np.random.uniform(pop.orbparams['inc'][0], pop.orbparams['inc'][1], size = 1)
+            p.ec = np.random.uniform(pop.orbparams['ec'][0], pop.orbparams['ec'][1], size = 1)
+            p.pod = np.random.uniform(pop.orbparams['pod'][0], pop.orbparams['pod'][1], size = 1)
         
         #dither the distance
         if dither:
