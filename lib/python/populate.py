@@ -43,7 +43,7 @@ def generate(ngen,
              zscale=0.33,
              duty_percent=6.,
              scindex=-3.86,
-             gpsArgs=[-1, None],
+             gpsArgs=[-1, -1],
              doubleSpec=[-1, None],
              nostdout=False,
              pattern='gaussian',
@@ -266,7 +266,7 @@ def generate(ngen,
         # AND double spectra. But for now I assume only have one or
         # none of these types.
         if random.random() > pop.gpsFrac:
-            # This will evaluate true when gpsArgs[0] is NoneType
+            # This will evaluate true when gpsArgs[0] is -1
             # might have to change in future
             p.gpsFlag = 0
         else:
