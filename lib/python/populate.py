@@ -44,7 +44,7 @@ def generate(ngen,
              duty_percent=6.,
              scindex=-3.86,
              gpsArgs=[-1, -1],
-             doubleSpec=[-1, None],
+             doubleSpec=[-1, -1],
              nostdout=False,
              pattern='gaussian',
              orbits=False,
@@ -717,7 +717,7 @@ if __name__ == '__main__':
 
     # double-spectral-index sources
     parser.add_argument('-doublespec', type=float, nargs=2, required=False,
-                        default=[None, None],
+                        default=[-1, -1],
                         help='Dbl spec fraction and alpha value')
     # dist_gen_file
     parser.add_argument('-dgf', type=str,metavar='dist_gen_file', required= False,
