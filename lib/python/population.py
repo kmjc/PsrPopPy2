@@ -25,7 +25,7 @@ class Population:
                  lumsigma=None,
                  zscale=None,
                  electronModel=None,
-                 gpsFrac=None,
+                 gpsFrac=-1,
                  gpsA=None,
                  brokenFrac=None,
                  brokenSI=None,
