@@ -712,7 +712,7 @@ if __name__ == '__main__':
 
     # GPS sources
     parser.add_argument('-gps', type=float, nargs=2, required=False,
-                        default=[None, None],
+                        default=[-1, -1],
                         help='GPS fraction and "a" value')
 
     # double-spectral-index sources
